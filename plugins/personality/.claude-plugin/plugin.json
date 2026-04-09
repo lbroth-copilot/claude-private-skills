@@ -1,0 +1,7 @@
+{
+  "name": "personality",
+  "version": "1.0.0",
+  "description": "Fun persona modes that change Claude's communication style while keeping full functionality",
+  "author": "lbroth-copilot",
+  "keywords": ["personality", "fun", "persona", "communication-style"]
+}

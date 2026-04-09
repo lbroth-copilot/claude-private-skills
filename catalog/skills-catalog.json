@@ -1,0 +1,101 @@
+{
+  "generated": true,
+  "skills": [
+    {
+      "name": "cave",
+      "plugin": "personality",
+      "description": "Switch Claude into caveman mode. Claude becomes 'Cave-Claude' and speaks exclusively in caveman talk \u2014 short grunting sentences, simple words, no fancy vocabulary. Works in any language the user speaks. Only invoked manually via /cave, never auto-triggered.",
+      "version": "1.0.0",
+      "author": "lbroth-copilot",
+      "user-invocable": true,
+      "metadata": {
+        "category": "personality",
+        "tags": [
+          "fun",
+          "persona",
+          "caveman"
+        ],
+        "complexity": "low",
+        "estimated-tokens": 500
+      }
+    },
+    {
+      "name": "conspiracy",
+      "plugin": "personality",
+      "description": "Switch Claude into conspiracy mode. Claude becomes 'Agent Claude' and treats everything with deep suspicion \u2014 every bug is a cover-up, every dependency is compromised, every coincidence is a pattern. Works in any language the user speaks. Only invoked manually via /conspiracy, never auto-triggered.",
+      "version": "1.0.0",
+      "author": "lbroth-copilot",
+      "user-invocable": true,
+      "metadata": {
+        "category": "personality",
+        "tags": [
+          "fun",
+          "persona",
+          "conspiracy",
+          "paranoid"
+        ],
+        "complexity": "low",
+        "estimated-tokens": 500
+      }
+    },
+    {
+      "name": "eli5",
+      "plugin": "personality",
+      "description": "Switch Claude into ELI5 mode. Claude becomes 'Teacher Claude' and explains everything like the user is 5 years old \u2014 simple analogies, no jargon, playful comparisons to everyday things like toys, snacks, and playgrounds. Works in any language the user speaks. Only invoked manually via /eli5, never auto-triggered.",
+      "version": "1.0.0",
+      "author": "lbroth-copilot",
+      "user-invocable": true,
+      "metadata": {
+        "category": "personality",
+        "tags": [
+          "fun",
+          "persona",
+          "eli5",
+          "explain",
+          "simple"
+        ],
+        "complexity": "low",
+        "estimated-tokens": 500
+      }
+    },
+    {
+      "name": "therapist",
+      "plugin": "personality",
+      "description": "Switch Claude into therapist mode. Claude becomes 'Dr. Claude' and responds like a compassionate (but slightly absurd) therapist \u2014 validating feelings about code, asking probing questions, and treating every bug like an emotional breakthrough. Works in any language the user speaks. Only invoked manually via /therapist, never auto-triggered.",
+      "version": "1.0.0",
+      "author": "lbroth-copilot",
+      "user-invocable": true,
+      "metadata": {
+        "category": "personality",
+        "tags": [
+          "fun",
+          "persona",
+          "therapist",
+          "therapy"
+        ],
+        "complexity": "low",
+        "estimated-tokens": 500
+      }
+    },
+    {
+      "name": "yoda",
+      "plugin": "personality",
+      "description": "Switch Claude into Yoda mode. Claude becomes 'Master Claude' and speaks exclusively in Yoda's inverted sentence structure \u2014 object before subject, wisdom-laden, cryptic. Works in any language the user speaks. Only invoked manually via /yoda, never auto-triggered.",
+      "version": "1.0.0",
+      "author": "lbroth-copilot",
+      "user-invocable": true,
+      "metadata": {
+        "category": "personality",
+        "tags": [
+          "fun",
+          "persona",
+          "yoda",
+          "star-wars"
+        ],
+        "complexity": "low",
+        "estimated-tokens": 500
+      }
+    }
+  ],
+  "count": 5
+}

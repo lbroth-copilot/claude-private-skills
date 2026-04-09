@@ -1,0 +1,308 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+MARKETPLACE_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+MARKETPLACE_JSON="$MARKETPLACE_ROOT/.claude-plugin/marketplace.json"
+
+# Colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+BLUE='\033[0;34m'
+CYAN='\033[0;36m'
+BOLD='\033[1m'
+NC='\033[0m'
+
+usage() {
+    cat <<EOF
+${BOLD}claude-private-skills marketplace${NC}
+
+${BOLD}USAGE:${NC}
+    marketplace <command> [options]
+
+${BOLD}COMMANDS:${NC}
+    install [plugin]      Install a plugin (symlinks skills to Claude config)
+    uninstall [plugin]    Remove installed plugin symlinks
+    list                  List all plugins and their skills
+    validate [path]       Validate SKILL.md frontmatter
+    generate              Regenerate catalog JSON files
+
+${BOLD}OPTIONS:${NC}
+    --scope user|project  Install to ~/.claude (default) or ./.claude
+    --force               Overwrite existing symlinks
+    --dry-run             Show what would be done without executing
+    --help                Show this help
+
+${BOLD}EXAMPLES:${NC}
+    marketplace install personality
+    marketplace install personality --scope project
+    marketplace list
+    marketplace validate
+EOF
+}
+
+# Parse a simple YAML frontmatter value from a SKILL.md file
+parse_frontmatter() {
+    local file="$1" key="$2"
+    sed -n '/^---$/,/^---$/p' "$file" | grep "^${key}:" | head -1 | sed "s/^${key}:[[:space:]]*//"
+}
+
+cmd_list() {
+    echo -e "${BOLD}Marketplace: claude-private-skills${NC}"
+    echo ""
+
+    local plugin_count=0
+    local skill_count=0
+
+    for plugin_dir in "$MARKETPLACE_ROOT"/plugins/*/; do
+        [ -d "$plugin_dir" ] || continue
+        local plugin_name
+        plugin_name=$(basename "$plugin_dir")
+        local plugin_desc=""
+
+        if [ -f "$plugin_dir/.claude-plugin/plugin.json" ]; then
+            plugin_desc=$(python3 -c "import json; print(json.load(open('$plugin_dir/.claude-plugin/plugin.json'))['description'])" 2>/dev/null || echo "")
+        fi
+
+        echo -e "  ${BLUE}${BOLD}$plugin_name${NC} — $plugin_desc"
+        ((plugin_count++)) || true
+
+        for skill_dir in "$plugin_dir"/skills/*/; do
+            [ -d "$skill_dir" ] || continue
+            local skill_name
+            skill_name=$(basename "$skill_dir")
+
+            if [ -f "$skill_dir/SKILL.md" ]; then
+                local desc
+                desc=$(parse_frontmatter "$skill_dir/SKILL.md" "name")
+                local tags
+                tags=$(parse_frontmatter "$skill_dir/SKILL.md" "  tags")
+                echo -e "    ${GREEN}/$skill_name${NC}"
+            fi
+            ((skill_count++)) || true
+        done
+        echo ""
+    done
+
+    echo -e "${BOLD}Total:${NC} $plugin_count plugin(s), $skill_count skill(s)"
+}
+
+cmd_install() {
+    local plugin_name="${1:-}"
+    local scope="user"
+    local force=false
+    local dry_run=false
+
+    shift || true
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --scope) scope="$2"; shift 2 ;;
+            --force) force=true; shift ;;
+            --dry-run) dry_run=true; shift ;;
+            *) echo -e "${RED}Unknown option: $1${NC}"; exit 1 ;;
+        esac
+    done
+
+    if [ -z "$plugin_name" ]; then
+        echo -e "${RED}Error: Plugin name required${NC}"
+        echo "Usage: marketplace install <plugin> [--scope user|project] [--force]"
+        exit 1
+    fi
+
+    local plugin_dir="$MARKETPLACE_ROOT/plugins/$plugin_name"
+    if [ ! -d "$plugin_dir" ]; then
+        echo -e "${RED}Error: Plugin '$plugin_name' not found${NC}"
+        echo "Available plugins:"
+        for d in "$MARKETPLACE_ROOT"/plugins/*/; do
+            [ -d "$d" ] && echo "  - $(basename "$d")"
+        done
+        exit 1
+    fi
+
+    local target_dir
+    if [ "$scope" = "project" ]; then
+        target_dir="$(pwd)/.claude/skills"
+    else
+        target_dir="$HOME/.claude/skills"
+    fi
+
+    echo -e "${BOLD}Installing plugin: ${BLUE}$plugin_name${NC} (scope: $scope)"
+    echo -e "Target: $target_dir"
+    echo ""
+
+    mkdir -p "$target_dir"
+
+    local installed=0
+    local skipped=0
+
+    for skill_dir in "$plugin_dir"/skills/*/; do
+        [ -d "$skill_dir" ] || continue
+        local skill_name
+        skill_name=$(basename "$skill_dir")
+        local link_path="$target_dir/$skill_name"
+
+        if [ -e "$link_path" ] || [ -L "$link_path" ]; then
+            if [ "$force" = true ]; then
+                if [ "$dry_run" = true ]; then
+                    echo -e "  ${YELLOW}[dry-run]${NC} Would overwrite: $skill_name"
+                else
+                    rm -rf "$link_path"
+                    ln -s "$skill_dir" "$link_path"
+                    echo -e "  ${GREEN}+${NC} $skill_name ${YELLOW}(overwritten)${NC}"
+                fi
+                ((installed++)) || true
+            else
+                echo -e "  ${YELLOW}-${NC} $skill_name (exists, use --force to overwrite)"
+                ((skipped++)) || true
+            fi
+        else
+            if [ "$dry_run" = true ]; then
+                echo -e "  ${YELLOW}[dry-run]${NC} Would install: $skill_name"
+            else
+                ln -s "$skill_dir" "$link_path"
+                echo -e "  ${GREEN}+${NC} $skill_name"
+            fi
+            ((installed++))
+        fi
+    done
+
+    echo ""
+    if [ "$dry_run" = true ]; then
+        echo -e "${BOLD}Dry run complete.${NC} Would install $installed skill(s), skip $skipped."
+    else
+        echo -e "${BOLD}Done.${NC} Installed $installed skill(s), skipped $skipped."
+    fi
+}
+
+cmd_uninstall() {
+    local plugin_name="${1:-}"
+    local scope="user"
+
+    shift || true
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --scope) scope="$2"; shift 2 ;;
+            *) echo -e "${RED}Unknown option: $1${NC}"; exit 1 ;;
+        esac
+    done
+
+    if [ -z "$plugin_name" ]; then
+        echo -e "${RED}Error: Plugin name required${NC}"
+        exit 1
+    fi
+
+    local plugin_dir="$MARKETPLACE_ROOT/plugins/$plugin_name"
+    if [ ! -d "$plugin_dir" ]; then
+        echo -e "${RED}Error: Plugin '$plugin_name' not found${NC}"
+        exit 1
+    fi
+
+    local target_dir
+    if [ "$scope" = "project" ]; then
+        target_dir="$(pwd)/.claude/skills"
+    else
+        target_dir="$HOME/.claude/skills"
+    fi
+
+    echo -e "${BOLD}Uninstalling plugin: ${BLUE}$plugin_name${NC} (scope: $scope)"
+    echo ""
+
+    local removed=0
+
+    for skill_dir in "$plugin_dir"/skills/*/; do
+        [ -d "$skill_dir" ] || continue
+        local skill_name
+        skill_name=$(basename "$skill_dir")
+        local link_path="$target_dir/$skill_name"
+
+        if [ -L "$link_path" ]; then
+            local link_target
+            link_target=$(readlink -f "$link_path")
+            local expected_target
+            expected_target=$(readlink -f "$skill_dir")
+
+            if [ "$link_target" = "$expected_target" ]; then
+                rm "$link_path"
+                echo -e "  ${RED}-${NC} $skill_name"
+                ((removed++)) || true
+            else
+                echo -e "  ${YELLOW}~${NC} $skill_name (symlink points elsewhere, skipping)"
+            fi
+        elif [ -e "$link_path" ]; then
+            echo -e "  ${YELLOW}~${NC} $skill_name (not a symlink, skipping)"
+        fi
+    done
+
+    echo ""
+    echo -e "${BOLD}Done.${NC} Removed $removed skill(s)."
+}
+
+cmd_validate() {
+    local target="${1:-$MARKETPLACE_ROOT/plugins}"
+    local errors=0
+    local warnings=0
+    local checked=0
+
+    echo -e "${BOLD}Validating skills...${NC}"
+    echo ""
+
+    while IFS= read -r -d '' skill_file; do
+        ((checked++)) || true
+        local skill_dir
+        skill_dir=$(dirname "$skill_file")
+        local skill_name
+        skill_name=$(basename "$skill_dir")
+        local has_error=false
+
+        # Check frontmatter exists
+        if ! head -1 "$skill_file" | grep -q '^---$'; then
+            echo -e "  ${RED}FAIL${NC} $skill_name — missing YAML frontmatter"
+            ((errors++)) || true
+            continue
+        fi
+
+        # Check required fields
+        for field in name description version; do
+            if ! parse_frontmatter "$skill_file" "$field" | grep -q '.'; then
+                echo -e "  ${RED}FAIL${NC} $skill_name — missing field: $field"
+                has_error=true
+                ((errors++)) || true
+            fi
+        done
+
+        # Check recommended fields
+        for field in author license; do
+            if ! parse_frontmatter "$skill_file" "$field" | grep -q '.'; then
+                echo -e "  ${YELLOW}WARN${NC} $skill_name — missing recommended field: $field"
+                ((warnings++)) || true
+            fi
+        done
+
+        if [ "$has_error" = false ]; then
+            echo -e "  ${GREEN}PASS${NC} $skill_name"
+        fi
+
+    done < <(find "$target" -name "SKILL.md" -print0 | sort -z)
+
+    echo ""
+    echo -e "${BOLD}Checked $checked skill(s): ${GREEN}$((checked - errors)) passed${NC}, ${RED}$errors error(s)${NC}, ${YELLOW}$warnings warning(s)${NC}"
+
+    [ "$errors" -eq 0 ]
+}
+
+cmd_generate() {
+    echo -e "${BOLD}Generating catalog...${NC}"
+    python3 "$MARKETPLACE_ROOT/catalog/generate-catalog.py" "$MARKETPLACE_ROOT"
+    echo -e "${GREEN}Done.${NC} Catalog written to catalog/skills-catalog.json"
+}
+
+# Main
+case "${1:-}" in
+    install)    shift; cmd_install "$@" ;;
+    uninstall)  shift; cmd_uninstall "$@" ;;
+    list)       cmd_list ;;
+    validate)   shift; cmd_validate "$@" ;;
+    generate)   cmd_generate ;;
+    --help|-h)  usage ;;
+    *)          usage; exit 1 ;;
+esac

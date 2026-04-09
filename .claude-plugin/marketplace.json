@@ -1,0 +1,19 @@
+{
+  "name": "claude-private-skills",
+  "version": "1.0.0",
+  "description": "Private Claude Code skill marketplace",
+  "plugins": [
+    {
+      "name": "personality",
+      "source": "./plugins/personality",
+      "description": "Personality modes — 5 fun persona skills that change Claude's communication style",
+      "version": "1.0.0"
+    }
+  ],
+  "metadata": {
+    "plugin_count": 1,
+    "total_skills": 5,
+    "total_agents": 0,
+    "total_mcp_servers": 0
+  }
+}
