@@ -95,7 +95,23 @@
         "complexity": "low",
         "estimated-tokens": 500
       }
+    },
+    {
+      "name": "debug-vm",
+      "plugin": "tools",
+      "description": "Find and connect to IONOS Cloud debugging VMs provisioned with the debug-vm tool. Use when the user wants to deploy to, test on, SSH into, or check status of their debug VMs. Triggers on references to \"debug VM\", \"my VM\", \"test server\", \"deploy to VM\", or when needing a remote Linux machine for testing.",
+      "version": "0.0.0",
+      "author": "",
+      "user-invocable": false
+    },
+    {
+      "name": "skill-creator",
+      "plugin": "tools",
+      "description": "Guide for creating effective skills. This skill should be used when users want to create a new skill (or update an existing skill) that extends Claude's capabilities with specialized knowledge, workflows, or tool integrations.",
+      "version": "0.0.0",
+      "author": "",
+      "user-invocable": false
     }
   ],
-  "count": 5
+  "count": 7
 }
