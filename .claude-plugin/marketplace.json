@@ -2,6 +2,17 @@
   "name": "claude-private-skills",
   "version": "1.1.0",
   "description": "Private Claude Code skill marketplace",
+  "owner": {
+    "name": "Lukas Benjamin Roth",
+    "organization": "IONOS Server Technology",
+    "email": "lukasbenjamin.roth@strato.de"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lbroth-copilot/claude-private-skills.git"
+  },
+  "homepage": "https://github.com/lbroth-copilot/claude-private-skills",
+  "license": "proprietary",
   "plugins": [
     {
       "name": "personality",
