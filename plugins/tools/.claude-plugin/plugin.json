@@ -1,10 +1,10 @@
 {
   "name": "tools",
-  "version": "1.0.0",
-  "description": "Workflow and productivity tools — debug VM connector, skill creator",
+  "version": "1.1.0",
+  "description": "Workflow and productivity tools — debug VM connector, skill creator, JIRA comment writer",
   "author": {
     "name": "Lukas Benjamin Roth",
     "email": "lukasbenjamin.roth@strato.de"
   },
-  "keywords": ["tools", "debug", "vm", "skill-creator", "workflow"]
+  "keywords": ["tools", "debug", "vm", "skill-creator", "workflow", "jira", "writing"]
 }

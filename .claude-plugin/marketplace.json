@@ -23,13 +23,13 @@
     {
       "name": "tools",
       "source": "./plugins/tools",
-      "description": "Workflow and productivity tools — debug VM connector, skill creator",
-      "version": "1.0.0"
+      "description": "Workflow and productivity tools — debug VM connector, skill creator, JIRA comment writer",
+      "version": "1.1.0"
     }
   ],
   "metadata": {
     "plugin_count": 2,
-    "total_skills": 7,
+    "total_skills": 8,
     "total_agents": 0,
     "total_mcp_servers": 0
   }

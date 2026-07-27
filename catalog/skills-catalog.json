@@ -100,18 +100,36 @@
       "name": "debug-vm",
       "plugin": "tools",
       "description": "Find and connect to IONOS Cloud debugging VMs provisioned with the debug-vm tool. Use when the user wants to deploy to, test on, SSH into, or check status of their debug VMs. Triggers on references to \"debug VM\", \"my VM\", \"test server\", \"deploy to VM\", or when needing a remote Linux machine for testing.",
-      "version": "0.0.0",
-      "author": "",
+      "version": "1.0.0",
+      "author": "Lukas Benjamin Roth <lukasbenjamin.roth@strato.de>",
       "user-invocable": false
+    },
+    {
+      "name": "jira-comment",
+      "plugin": "tools",
+      "description": "Write concise, precise JIRA comments in English that a junior developer can act on without asking follow-up questions, and that do not read like AI-generated text. Covers status updates, root-cause analysis, handover/how-to instructions, and review or decision rationale. Drafts the comment, self-checks it against known AI writing tells, shows it for confirmation, then posts it via the Atlassian MCP. Use when asked to: comment on a JIRA ticket, \"write a JIRA comment\", \"add a comment to IF-123 / ITZVULN-456 / PROJ-789\", \"document this in JIRA\", \"update the ticket\", \"explain this in the ticket for a junior\", or \"post my findings to the ticket\". Triggers on: \"jira comment\", \"kommentar\", \"comment on <TICKET-KEY>\", \"update ticket\", \"document in the ticket\".",
+      "version": "1.0.0",
+      "author": "Lukas Benjamin Roth <lukasbenjamin.roth@strato.de>",
+      "user-invocable": true,
+      "metadata": {
+        "category": "workflow",
+        "tags": [
+          "jira",
+          "writing",
+          "communication",
+          "atlassian"
+        ],
+        "complexity": "medium"
+      }
     },
     {
       "name": "skill-creator",
       "plugin": "tools",
       "description": "Guide for creating effective skills. This skill should be used when users want to create a new skill (or update an existing skill) that extends Claude's capabilities with specialized knowledge, workflows, or tool integrations.",
-      "version": "0.0.0",
-      "author": "",
+      "version": "1.0.0",
+      "author": "Anthropic",
       "user-invocable": false
     }
   ],
-  "count": 7
+  "count": 8
 }
