@@ -1,6 +1,9 @@
 ---
 name: debug-vm
 description: Find and connect to IONOS Cloud debugging VMs provisioned with the debug-vm tool. Use when the user wants to deploy to, test on, SSH into, or check status of their debug VMs. Triggers on references to "debug VM", "my VM", "test server", "deploy to VM", or when needing a remote Linux machine for testing.
+version: 1.0.0
+author: Lukas Benjamin Roth <lukasbenjamin.roth@strato.de>
+license: proprietary
 ---
 
 # debug-vm
